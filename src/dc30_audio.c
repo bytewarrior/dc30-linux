@@ -98,7 +98,8 @@
 
 /* Analog path. On the DC30 the audio inputs are wired to the AD1843's Mic
  * and Aux 2 inputs (dc30.sys _AudioSelectSource offers only ADC sources 1
- * and 3), not to Line. Which socket is which is still to be confirmed.
+ * and 3), not to Line. Mic is the external audio jack (a VCR there
+ * records through it), Aux 2 the internal audio connector.
  */
 #define AD1843_REG_ADC_INPUT	2
 #define AD1843_ADC_SRC_MIC	0x2020	/* LSS/RSS: dc30.sys default */
