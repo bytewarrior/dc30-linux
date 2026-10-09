@@ -34,10 +34,12 @@
 
 #define DC30_JPEG_BUFS		4	/* entries in the code buffer table */
 
-/* The fragment length is written in bytes as dc30.sys does, but the
- * datasheet says doublewords (the GPL driver writes dwords * 2). Until
- * the board shows which one it is, every buffer has room for the larger
- * reading.
+/* The fragment length is written in bytes, as dc30.sys does. The
+ * datasheet counts it in doublewords (the GPL driver writes dwords * 2),
+ * and the board follows the datasheet: with 256 KB written, it completed
+ * frames larger than that. The ZR36057 may thus fill twice the written
+ * length, so every buffer is that large. Frames over DC30_JPEG_MAX_FRAME
+ * do not fit the vb2 buffer and are dropped as oversize.
  */
 #define DC30_JPEG_BUF_ALLOC	(2 * DC30_JPEG_MAX_FRAME)
 
