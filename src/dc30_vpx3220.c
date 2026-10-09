@@ -33,6 +33,7 @@
 #include <linux/i2c.h>
 #include <linux/module.h>
 #include <linux/swab.h>
+#include <linux/version.h>
 #include <media/v4l2-ctrls.h>
 #include <media/v4l2-device.h>
 #include <media/v4l2-subdev.h>
@@ -679,7 +680,9 @@ static const struct file_operations vpx3220_dbg_fops = {
 	.open = simple_open,
 	.read = vpx3220_dbg_read,
 	.write = vpx3220_dbg_write,
-	.llseek = no_llseek,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 12, 0)
+	.llseek = no_llseek,	/* the default from 6.12 on, and gone */
+#endif
 };
 
 static void vpx3220_debugfs_init(struct i2c_client *client,
