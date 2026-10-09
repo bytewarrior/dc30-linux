@@ -1,0 +1,44 @@
+# Recording application and metadata tool. build-debs.sh replaces
+# @VERSION@ and @STAGE@ and adds the shared library dependencies that
+# dpkg-shlibdeps finds below "depends:".
+name: dc30-capture
+arch: amd64
+platform: linux
+version: "@VERSION@"
+section: video
+priority: optional
+maintainer: "bytewarrior <1134981+bytewarrior@users.noreply.github.com>"
+description: |
+  Recording application for the miro DC30 video capture card
+  dc30-capture records video and audio from a miro DC30 in step: FFV1
+  (lossless) or the card's MJPEG, PCM audio, Matroska files on the card's
+  time base. It pairs interlaced fields by the picture, which keeps the
+  field order right on VCR signals. Includes dc30-metadump, a tool that
+  prints the driver's per-frame metadata.
+vendor: "dc30-linux"
+homepage: https://github.com/bytewarrior/dc30-linux
+license: GPL-2.0-only
+
+depends:
+  # The Qt platform plugins; no library links to them.
+  - qt6-qpa-plugins
+recommends:
+  - dc30-dkms (= @VERSION@)
+
+contents:
+  - src: "@STAGE@/usr/bin/dc30-capture"
+    dst: /usr/bin/dc30-capture
+    file_info:
+      mode: 0755
+  - src: "@STAGE@/usr/bin/dc30-metadump"
+    dst: /usr/bin/dc30-metadump
+    file_info:
+      mode: 0755
+  - src: "@STAGE@/usr/share/applications/dc30-capture.desktop"
+    dst: /usr/share/applications/dc30-capture.desktop
+    file_info:
+      mode: 0644
+  - src: "@STAGE@/usr/share/icons/hicolor/64x64/apps/dc30-capture.png"
+    dst: /usr/share/icons/hicolor/64x64/apps/dc30-capture.png
+    file_info:
+      mode: 0644

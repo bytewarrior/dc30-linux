@@ -1,0 +1,29 @@
+# Driver sources for DKMS. build-debs.sh replaces @VERSION@ and @SRC@.
+name: dc30-dkms
+arch: all
+platform: linux
+version: "@VERSION@"
+section: kernel
+priority: optional
+maintainer: "bytewarrior <1134981+bytewarrior@users.noreply.github.com>"
+description: |
+  Linux driver for the miro DC30 video capture card (DKMS)
+  V4L2 and ALSA driver for the miro DC30 / DC30 plus PCI capture card
+  (Zoran ZR36057, ZR36050, ZR36016, VPX3220A, AD1843): raw and MJPEG
+  video capture and audio locked to the video. DKMS builds the modules
+  dc30 and dc30_vpx3220 for every installed kernel.
+vendor: "dc30-linux"
+homepage: https://github.com/bytewarrior/dc30-linux
+license: GPL-2.0-only
+
+depends:
+  - dkms
+
+contents:
+  - src: "@SRC@/"
+    dst: /usr/src/dc30-@VERSION@
+    type: tree
+
+scripts:
+  postinstall: "@SCRIPTS@/dkms-postinst.sh"
+  preremove: "@SCRIPTS@/dkms-prerm.sh"

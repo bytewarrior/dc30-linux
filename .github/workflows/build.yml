@@ -1,0 +1,40 @@
+# Build check for every push and pull request: the kernel modules against
+# the runner's kernel, and both Debian packages (kept as a workflow artifact).
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    env:
+      NFPM_VERSION: "2.43.0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake pkgconf dpkg-dev \
+            "linux-headers-$(uname -r)" \
+            qt6-base-dev qt6-tools-dev qt6-l10n-tools \
+            libasound2-dev libavcodec-dev libavformat-dev libswresample-dev
+          curl -sSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_amd64.deb" -o /tmp/nfpm.deb
+          sudo dpkg -i /tmp/nfpm.deb
+
+      - name: Build kernel modules
+        run: make -C src KDIR="/lib/modules/$(uname -r)/build"
+
+      - name: Build packages
+        run: |
+          version=$(sed -n 's/^PACKAGE_VERSION="\(.*\)"/\1/p' src/dkms.conf)
+          packaging/build-debs.sh "$version" dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: dist/*.deb

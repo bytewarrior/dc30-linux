@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=DC30 Capture
+GenericName=Video Capture
+GenericName[de]=Videoaufnahme
+Comment=Record video and audio from a miro DC30 capture card
+Comment[de]=Bild und Ton von einer miro-DC30-Karte aufnehmen
+Exec=dc30-capture
+Icon=dc30-capture
+Terminal=false
+Categories=AudioVideo;Video;Recorder;
+Keywords=capture;video;VHS;digitize;miro;DC30;

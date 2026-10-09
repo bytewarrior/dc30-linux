@@ -1,0 +1,29 @@
+# Kernel module build artifacts
+*.o
+*.ko
+*.mod
+*.mod.c
+*.symvers
+*.order
+.*.cmd
+.*.d
+.tmp_versions/
+.cache.mk
+Module.symvers
+modules.order
+
+# Userspace builds
+app/build/
+build/
+tools/dc30-metadump
+
+# Packages (packaging/build-debs.sh)
+build-pkg/
+dist/
+
+# Editor and OS cruft
+*.swp
+*~
+.DS_Store
+.vscode/
+.idea/

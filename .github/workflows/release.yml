@@ -1,0 +1,48 @@
+# Release: push a version tag, CI builds the Debian packages and publishes
+# them as a GitHub Release.
+#
+#   git tag v1.0.0 && git push origin v1.0.0
+#
+# The tag must match the version in src/dkms.conf, MODULE_VERSION and
+# app/CMakeLists.txt; packaging/build-debs.sh stops otherwise.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # create the release and upload assets
+
+jobs:
+  packages:
+    runs-on: ubuntu-24.04
+    env:
+      NFPM_VERSION: "2.43.0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake pkgconf dpkg-dev \
+            "linux-headers-$(uname -r)" \
+            qt6-base-dev qt6-tools-dev qt6-l10n-tools \
+            libasound2-dev libavcodec-dev libavformat-dev libswresample-dev
+          curl -sSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_amd64.deb" -o /tmp/nfpm.deb
+          sudo dpkg -i /tmp/nfpm.deb
+
+      - name: Build kernel modules
+        run: make -C src KDIR="/lib/modules/$(uname -r)/build"
+
+      - name: Build packages
+        # v1.0.0 -> 1.0.0 (Debian versions must not start with "v")
+        run: packaging/build-debs.sh "${GITHUB_REF_NAME#v}" dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.deb
+          generate_release_notes: true
