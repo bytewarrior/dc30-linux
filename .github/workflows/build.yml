@@ -20,14 +20,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             build-essential cmake pkgconf dpkg-dev \
-            "linux-headers-$(uname -r)" \
+            linux-headers-generic linux-headers-generic-hwe-24.04 \
             qt6-base-dev qt6-tools-dev qt6-l10n-tools \
             libasound2-dev libavcodec-dev libavformat-dev libswresample-dev
           curl -sSL "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_amd64.deb" -o /tmp/nfpm.deb
           sudo dpkg -i /tmp/nfpm.deb
 
+      # Against Ubuntu's generic kernels, the release one and the newer
+      # HWE one (the runner's own Azure kernel has no sound support).
       - name: Build kernel modules
-        run: make -C src KDIR="/lib/modules/$(uname -r)/build"
+        run: |
+          for kdir in /usr/src/linux-headers-*-generic; do
+            echo "::group::$kdir"
+            make -C src KDIR="$kdir"
+            make -C src KDIR="$kdir" clean
+            echo "::endgroup::"
+          done
 
       - name: Build packages
         run: |
