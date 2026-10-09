@@ -610,14 +610,19 @@ static void dc30_meta_stop_streaming(struct vb2_queue *vq)
 	spin_unlock_irqrestore(&vid->qlock, flags);
 }
 
+/* From 6.13 on vb2 releases and takes q->lock itself around a wait when
+ * these callbacks are missing, and later kernels dropped them.
+ */
 static const struct vb2_ops dc30_meta_vb2_ops = {
 	.queue_setup = dc30_meta_queue_setup,
 	.buf_prepare = dc30_meta_buf_prepare,
 	.buf_queue = dc30_meta_buf_queue,
 	.start_streaming = dc30_meta_start_streaming,
 	.stop_streaming = dc30_meta_stop_streaming,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 13, 0)
 	.wait_prepare = vb2_ops_wait_prepare,
 	.wait_finish = vb2_ops_wait_finish,
+#endif
 };
 
 static const struct vb2_ops dc30_vb2_ops = {
@@ -626,8 +631,10 @@ static const struct vb2_ops dc30_vb2_ops = {
 	.buf_queue = dc30_buf_queue,
 	.start_streaming = dc30_start_streaming,
 	.stop_streaming = dc30_stop_streaming,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 13, 0)
 	.wait_prepare = vb2_ops_wait_prepare,
 	.wait_finish = vb2_ops_wait_finish,
+#endif
 };
 
 static void dc30_meta_field_set(struct dc30_meta_field *f,
